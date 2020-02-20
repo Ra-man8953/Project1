@@ -1,10 +1,10 @@
 #User Registration 
 
-In registration have four params :
-a - f_name
-b - l_name
-c - email
-d - User_Id
+  In registration have four params :
+  a - f_name
+  b - l_name
+  c - email
+  d - User_Id
 
 #User Login
 
