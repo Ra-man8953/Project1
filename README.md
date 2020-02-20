@@ -22,11 +22,11 @@
 
 #Product 
 
-We have also perform CRUD operation here to take three params :
-a - User_Id 
-b - pdesc
-c - pname
+    We have also perform CRUD operation here to take three params :
+    a - User_Id 
+    b - pdesc
+    c - pname
 
 #Reviews 
 
-With the user specific Id we have to concatinate the specific user f_name with the specific product's_name_id.
+    With the user specific Id we have to concatinate the specific user f_name with the specific product's_name_id.
