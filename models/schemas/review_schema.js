@@ -1,8 +1,7 @@
 const db = require('../db');
 var schema = db.Schema({
-    r_id: { type: String, require: true, trim: true },
-    r_mess: { type: String, require: true, trim: true },
-    r_date: { type: String, require: true, trim: true },
+    review_id: { type: String, require: true, trim: true },
+    review_message: { type: String, require: true, trim: true },
     product_id: { type: String, require: true, trim: true }
 });
 
