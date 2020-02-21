@@ -5,10 +5,11 @@ var db_product = require('../../models/schemas/product_schema')
 // Crete the Product Reviews by the product Id
 
 exports.create_review = (req, res) => {
-
     var content = JSON.parse(req.body.toString())
+
     db_product.findOne({ p_id: req.params.p_id }, function(err, docs) {
-        if (docs !== null) {
+        console.log(docs)
+        if (docs == null) {
             var obj = new db({
                 review_id: content.review_id,
                 review_message: content.review_message,

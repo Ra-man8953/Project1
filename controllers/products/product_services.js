@@ -9,50 +9,40 @@ exports.create_product = (req, res) => {
     var u_id = req.params.u_id
 
     var content = JSON.parse(req.body.toString())
+    db_user.findOne({ _id: u_id }, function(err, docs) {
+        if (docs !== null && docs !== undefined) {
 
+            db_review.find({ product_id: content.p_id }, function(err, docs) {
+                if (docs.length) {
+                    var obj = new db_product({
+                        p_name: content.p_name,
+                        p_desc: content.p_desc,
+                        p_image: content.p_image,
+                        obj_id: req.params.u_id,
+                        reviews: docs
+                    })
 
-    db_product.findOne({ p_id: content.p_id }, function(err, docs) {
-        if (docs === null || docs === undefined) {
-            db_user.findOne({ _id: u_id }, function(err, docs) {
-                if (docs !== null && docs !== undefined) {
-
-                    db_review.find({ product_id: content.p_id }, function(err, docs) {
-                        if (docs.length) {
-                            var obj = new db_product({
-                                p_name: content.p_name,
-                                p_desc: content.p_desc,
-                                p_image: content.p_image,
-                                obj_id: req.params.u_id,
-                                reviews: docs
-                            })
-
-                            obj.save((err, data) => {
-                                if (!err) { res.send('product entered') } else { res.send(err) }
-                            })
-                        } else {
-                            var obj = new db_product({
-                                p_id: content.p_id,
-                                p_name: content.p_name,
-                                p_desc: content.p_desc,
-                                p_image: content.p_image,
-                                obj_id: req.params.u_id,
-                                reviews: []
-                            })
-
-                            obj.save((err, data) => {
-                                if (!err) { res.send('product entered') } else { res.send(err) }
-                            })
-                        }
-
+                    obj.save((err, data) => {
+                        if (!err) { res.send('product entered') } else { res.send(err) }
                     })
                 } else {
-                    res.send("user not exist");
+                    var obj = new db_product({
+                        p_name: content.p_name,
+                        p_desc: content.p_desc,
+                        p_image: content.p_image,
+                        obj_id: req.params.u_id,
+                        reviews: []
+                    })
+
+                    obj.save((err, data) => {
+                        if (!err) { res.send('product entered') } else { res.send(err) }
+                    })
                 }
+
             })
         } else {
-            res.send('product id already exist')
+            res.send("user not exist");
         }
-
     })
 }
 

@@ -9,7 +9,6 @@ router.post('/login', function(req, res) {
 
 
     var tokens = JSON.parse(req.body.toString()).token
-    console.log(tokens)
     if (tokens === undefined) {
         tokens = ' '
     }
