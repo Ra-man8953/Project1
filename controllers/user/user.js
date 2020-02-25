@@ -5,26 +5,29 @@ var router = express.Router();
 
 // registered the users and its details
 
-router.post('/', function(req, res) {
+router.post('/register', function(req, res) {
+    console.log('sdfvhf cgh')
     services.register(req, res)
 })
 
 // Delete the user through user id
 
-router.get('/delete/:u_id', function(req, res) {
+router.delete('/delete', function(req, res) {
+
     services.delete_user(req, res)
+
 })
 
 // update the user dewtails through user id
 
-router.post('/update/:u_id', function(req, res) {
+router.put('/update', function(req, res) {
     services.update_user(req, res)
 })
 
 
 // Retrieve the user details through the database
 
-router.get('/:u_id', function(req, res) {
+router.get('/users', function(req, res) {
     services.get_user(req, res)
 })
 

@@ -1,26 +1,46 @@
 const bcrypt = require('bcrypt')
+const conn = require('../../config/config.json');
 var db = require('../../models/schemas/user_schema')
 var db_product = require('../../models/schemas/product_schema')
+var jwt = require('jsonwebtoken')
+
 
 exports.register = (req, res) => {
 
     // content that help to convert the body data into the string
 
     var content = JSON.parse(req.body.toString())
+    var datas = {
+        f_name: content.f_name,
+        l_name: content.l_name,
+        email: content.email
+    };
+
 
     // Validate if the user are registered than the message are show user registered otherwise create the users
 
-    db_product.find({ email: content.email }, function(err, docs) {
+    db_product.find({ email: content.email }, function(err, docs, data) {
         if (docs.length) {
             var obj = new db({
                 f_name: content.f_name,
                 l_name: content.l_name,
                 email: content.email,
                 password: bcrypt.hashSync(content.password, 10),
-                products: docs
+
             })
+
             obj.save((err, data) => {
-                if (!err) { res.send(obj) } else { res.send(err) }
+                if (!err) {
+                    res.json({
+                        sucess: true,
+                        message: "User Add Successfully",
+                        data: datas
+                    })
+                } else res.json({
+                    sucess: false,
+                    message: "User Not Added",
+
+                })
             })
         } else {
             var obj = new db({
@@ -28,10 +48,21 @@ exports.register = (req, res) => {
                 l_name: content.l_name,
                 email: content.email,
                 password: bcrypt.hashSync(content.password, 10),
-                products: []
+
             })
             obj.save((err, data) => {
-                if (!err) { res.send(data) } else { res.send(err) }
+                if (!err) {
+                    res.json({
+                        sucess: true,
+                        message: "User Add Successfully",
+                        data: datas
+                    })
+                } else {
+                    res.json({
+                        sucess: false,
+                        message: "User not Added"
+                    })
+                }
             })
         }
     })
@@ -44,39 +75,73 @@ exports.register = (req, res) => {
 // Delete the user by the user ID
 
 exports.delete_user = (req, res) => {
+    var currentuser = req.headers.authorization;
 
-    var u_id = req.params.u_id;
+    jwt.verify(currentuser, conn[1].key, (err, data) => {
+        db.deleteOne({ email: data.email }, function(err, doc) {
 
-    db.deleteOne({ _id: u_id }, function(err, doc) {
-        if (doc.deletedCount === 0) {
+            if (doc.deletedCount === 0) {
 
-            res.send("user not exist");
+                res.json({
+                    sucess: false,
+                    message: "User Not Found",
+                    data: doc,
+                })
 
-        } else {
-            res.send("user deleted");
-
-        }
-
+            } else {
+                res.json({
+                    sucess: true,
+                    message: "User Deleted successfull",
+                    data: [""]
+                })
+            }
+        })
     })
+
 }
 
 
 // Update the user to the user Id and upgrade the details 
 
 exports.update_user = (req, res) => {
+    var currentuser = req.headers.authorization;
 
-    var u_id = req.params.u_id;
-    var content = JSON.parse(req.body.toString())
-    db.findOneAndUpdate({ _id: u_id }, content, { new: true }, function(err, doc) {
-        if (doc === null) {
+    jwt.verify(currentuser, conn[1].key, (err, data) => {
+        var content = JSON.parse(req.body.toString())
+        db.findOneAndUpdate({ db_email: data.email }, content, { new: true }, function(err, doc) {
+            var obj = new db({
+                f_name: doc.firstName,
+                l_name: doc.lastName,
+                email: doc.email,
+                password: bcrypt.hashSync(doc.password, 10)
+            })
+            obj.save((err, data) => {
 
-            res.send("user not exist");
+            })
+            var databa = {
+                f_name: data.firstName,
+                l_name: data.lastName,
+                email: data.email
+            }
+            if (doc === null) {
 
-        } else {
-            res.send("user updated");
+                return res.json({
+                    sucess: false,
+                    message: "User not Exist"
+                })
 
-        }
-    });
+            } else {
+                return res.json({
+                    sucess: true,
+                    message: "User Updated Successfully",
+                    data: databa
+                })
+
+            }
+        });
+
+    })
+
 
 }
 
@@ -86,17 +151,36 @@ exports.update_user = (req, res) => {
 // Get the user through the id
 
 exports.get_user = (req, res) => {
+    var currentuser = req.headers.authorization;
 
-    var u_id = req.params.u_id;
-    db.findOne({ _id: u_id }, function(err, data) {
-        if (data === null) {
+    jwt.verify(currentuser, conn[1].key, (err, data) => {
 
-            res.send("user not exist");
-
-        } else {
-            res.send(data);
-
+        var datab = {
+            f_name: data.firstName,
+            l_name: data.lastName,
+            email: data.email
         }
-    });
+        db.findOne({ email: data.email }, function(err, data) {
+
+            if (data === null) {
+
+                return res.json({
+                    sucess: false,
+                    message: "User Not Exist",
+                    data: [""]
+                })
+
+            } else {
+                return res.json({
+                    sucess: true,
+                    message: "Users Get Successfully ",
+                    data: datab
+                })
+
+            }
+        });
+    })
+
+
 
 }

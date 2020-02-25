@@ -8,7 +8,7 @@ exports.create_review = (req, res) => {
     var content = JSON.parse(req.body.toString())
 
     db_product.findOne({ p_id: req.params.p_id }, function(err, docs) {
-        console.log(docs)
+
         if (docs == null) {
             var obj = new db({
                 review_id: content.review_id,
@@ -31,7 +31,7 @@ exports.update_review = (req, res) => {
 
     var content = JSON.parse(req.body.toString())
 
-    formData.findOneAndUpdate({ review_id: req.params.id, product_id: req.params.p_id }, content, { new: true }, function(err, doc) {
+    db.findOneAndUpdate({ review_id: req.params.id, product_id: req.params.p_id }, content, { new: true }, function(err, doc) {
         if (doc === null) {
 
             res.send("product review or review id not exist");
