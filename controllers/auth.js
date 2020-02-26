@@ -17,7 +17,7 @@ var bcrypt = require('bcryptjs');
 exports.tokeninn = (req, res) => {
 
     var content = JSON.parse((req.body).toString())
-
+        // jwt.verify({ db_password: content.password })
     db.findOne({ email: content.email }, (err, data) => {
 
         if (!data) {
@@ -26,19 +26,27 @@ exports.tokeninn = (req, res) => {
                 message: "Incorrect login"
             })
         } else {
-            var token = jwt.sign({
-                id: data._id,
-                firstName: data.f_name,
-                lastName: data.l_name,
-                email: data.email,
-            }, conn[1].key, { expiresIn: 600 * 600 });
+            if (!bcrypt.compareSync(content.password, data.password)) {
+                res.json({
+                    sucess: false,
+                    message: "Invalid Credentials"
+                })
+            } else {
+                var token = jwt.sign({
+                    id: data._id,
+                    firstName: data.f_name,
+                    lastName: data.l_name,
+                    email: data.email,
+                }, conn[1].key, { expiresIn: 600 * 600 });
 
-            res.json({
-                sucess: true,
-                message: "Token Generated successfully",
-                token: token
+                res.json({
+                    sucess: true,
+                    message: "Token Generated successfully",
+                    token: token
 
-            })
+                })
+            }
+
 
         }
     })
