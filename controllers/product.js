@@ -1,7 +1,7 @@
 // Require the product schema to add product details
 var db_product = require('../models/product')
-
-// require the config file that pass database url to the user
+var db_review = require('../models/review')
+    // require the config file that pass database url to the user
 const conn = require('../config/config.json');
 
 // require it to create TOKEN to perform sign and verify operation 
@@ -27,7 +27,7 @@ exports.create_product = (req, res) => {
                 p_desc: content.p_desc,
                 p_image: content.p_image,
                 obj_id: data.id,
-                reviews: content.reviews
+                reviews: []
             })
             // variable that can send through the response of the data
         var datab = {
@@ -35,6 +35,7 @@ exports.create_product = (req, res) => {
                 p_desc: content.p_desc,
                 p_image: content.p_image,
                 user: datass
+
             }
             // save the data into the product schema
         obj.save((err, data) => {
@@ -126,31 +127,48 @@ exports.update_product = (req, res) => {
 
 exports.show_user_products = (req, res) => {
     jwt.verify(req.headers.authorization, conn[1].key, (err, data) => {
-        var id = req.params.id;
-        var datass = {
-            f_name: data.firstName,
-            l_name: data.lastName,
-            email: data.email
-        }
-        db_product.find({ _id: id }, (err, data) => {
+        db_product.find({ _id: req.params.id }).populate("obj_id").exec(function(err, story) {
+            db_review.find({ product_id: req.params.id }, (err, data) => {
+                var review = []
+                for (i = 0; i <= data.length.toString() - 1; i++) {
+                    var datass = data[i].review_message;
+                    review.push(datass);
+                }
+                story[0].reviews = review;
+                res.send(story)
 
-            var datab = {
-                p_id: id,
-                p_name: data[0].p_name,
-                p_desc: data[0].p_desc,
-                p_image: data[0].p_image,
-                obj_id: data[0].obj_id,
-                user: datass
-            }
-            if (data.length) {
-                return res.json({
-                    sucess: true,
-                    message: "Products  are Displayed",
-                    data: datab
-                })
-            } else {
-                res.send('no product for uthis user id')
-            }
-        })
+            })
+
+
+            // res.send(story)
+        });
+        // z[0].reviews = y
+
+        // var id = req.params.id;
+        // var datass = {
+        //     f_name: data.firstName,
+        //     l_name: data.lastName,
+        //     email: data.email
+        // }
+        // db_product.find({ _id: id }, (err, data) => {
+
+        //     var datab = {
+        //         p_id: id,
+        //         p_name: data[0].p_name,
+        //         p_desc: data[0].p_desc,
+        //         p_image: data[0].p_image,
+        //         obj_id: data[0].obj_id,
+        //         user: datass
+        //     }
+        //     if (data.length) {
+        //         return res.json({
+        //             sucess: true,
+        //             message: "Products  are Displayed",
+        //             data: datab
+        //         })
+        //     } else {
+        //         res.send('no product for uthis user id')
+        //     }
+        // })
     })
 }
