@@ -3,7 +3,7 @@ const conn = require('../config/config.json');
 const dbpath = conn[0].db_url;
 
 
-mongoose.connect(dbpath, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(dbpath, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
     .then(() => console.log('MongoDB Connected...'))
     .catch((err) => console.log(err))
 
